@@ -13,13 +13,13 @@ module ModBlock
         real :: dx, dy, dz
         
         ! Global index ranges for this block
-        integer :: x_range(2)  ! (start_index, end_index) in x direction
-        integer :: y_range(2)  
-        integer :: z_range(2)  
+        real :: x_range(2)  ! (start_index, end_index) in x direction
+        real :: y_range(2)  
+        real :: z_range(2)  
     end type BlockType
 
 contains
-    subroutine Init_OneBlock(block, irank, Mx, My, Mz, nx, ny, nz, ng, nvars)
+    subroutine Init_OneBlock(block, iBlock, Mx, My, Mz, nx, ny, nz, ng, nvars, x_range_global, y_range_global, z_range_global)
         ! Initialize a block based on MPI rank and block configuration
         !
         ! Arguments:
@@ -31,8 +31,9 @@ contains
         ! nvars   - Number of variables stored per grid point
         implicit none
         type(BlockType), target :: block
-        integer, intent(in) :: irank, Mx, My, Mz
+        integer, intent(in) :: iBlock, Mx, My, Mz
         integer, intent(in) :: nx, ny, nz, ng, nvars
+        real, intent(in) :: x_range_global, y_range_global, z_range_global
         integer :: ix, iy, iz
         
         ! Store grid dimensions
@@ -42,24 +43,33 @@ contains
         block%ng = ng
         
         ! Calculate block indices (convert rank to i,j,k indices)
-        ! rank = ix + Mx*iy + (Mx*My)*iz
-        iz = irank / (Mx * My)
-        iy = mod(irank, Mx * My) / Mx
-        ix = mod(irank, Mx)
+        ! rank = ix + Mx*(iy-1) + (Mx*My)*(iz-1)
+        iz = iBlock / (Mx * My) +  1
+        iy = (mod(iBlock - 1, Mx * My) + 1) / Mx + 1
+        ix = mod(iBlock - 1, Mx) + 1
         
+        block%x_range(1) = (ix - 1) * nx * (x_range_global / real(Mx * nx)) + 1
+        block%x_range(2) = ix * nx * (x_range_global / real(Mx * nx))
+        block%y_range(1) = (iy - 1) * ny * (y_range_global / real(My * ny)) + 1
+        block%y_range(2) = iy * ny * (y_range_global / real(My * ny))
+        block%z_range(1) = (iz - 1) * nz * (z_range_global / real(Mz * nz)) + 1
+        block%z_range(1) = iz * nz * (z_range_global / real(Mz * nz))
+
+        block%dx = (x_range_global / real(Mx * nx))
+        block%dy = (y_range_global / real(My * ny))
+        block%dz = (z_range_global / real(Mz * nz)) 
+
         ! Calculate global index ranges for this block
-        block%x_range(1) = ix * nx + 1
-        block%x_range(2) = (ix + 1) * nx
-        
-        block%y_range(1) = iy * ny + 1
-        block%y_range(2) = (iy + 1) * ny
-        
-        block%z_range(1) = iz * nz + 1
-        block%z_range(2) = (iz + 1) * nz
+        ! block%x_range(1) = ix * nx + 1
+        ! block%x_range(2) = (ix + 1) * nx
+        ! block%y_range(1) = iy * ny + 1
+        ! block%y_range(2) = (iy + 1) * ny
+        ! block%z_range(1) = iz * nz + 1
+        ! block%z_range(2) = (iz + 1) * nz
         
         ! Allocate memory for values array including ghost cells
         if (allocated(block%values)) deallocate(block%values)
-        allocate(block%values(-ng:nx+ng, -ng:ny+ng, -ng:nz+ng, nvars))
+        allocate(block%values(-ng+1:nx+ng, -ng+1:ny+ng, -ng+1:nz+ng, nvars))
         block%values = 0.0
     end subroutine Init_OneBlock
     
@@ -70,14 +80,15 @@ contains
         if (allocated(block%values)) deallocate(block%values)
     end subroutine Clean_OneBlock
 
-    subroutine Init_AllBlocks(blocks, nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars)
+    subroutine Init_AllBlocks(blocks, nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars, x_range_global, y_range_global, z_range_global)
         implicit none
         type(BlockType), dimension(:), intent(inout) :: blocks
         integer, intent(in) :: nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars
+        real, intent(in) :: x_range_global, y_range_global, z_range_global
         integer :: iBlock
 
         do iBlock = 0, nBlocks-1
-            call Init_OneBlock(blocks(iBlock+1), iBlock, Mx, My, Mz, nx, ny, nz, ng, nvars)
+            call Init_OneBlock(blocks(iBlock+1), iBlock, Mx, My, Mz, nx, ny, nz, ng, nvars, x_range_global, y_range_global, z_range_global)
         end do
     end subroutine Init_AllBlocks
 
