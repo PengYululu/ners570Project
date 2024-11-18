@@ -1,12 +1,10 @@
 module ModJobAssigner
-    use mpi
-
-    ! use ModParamReader
-    ! use ModParameters
 
     implicit none
 
 contains
+
+    ! Get the range of local iBlocks
     subroutine GetRange(irank, iBlock, nBlockTotal, nRanks, iStart, iEnd)
         integer, intent(in) :: irank, nBlockTotal, nRanks
         integer, intent(out) :: iBlock, iStart, iEnd
@@ -25,11 +23,17 @@ contains
 
     end subroutine GetRange
 
-    subroutine GetiRank(nBlockTotal, nRanks, iBlock)
-        integer, intent(in) :: nBlockTotal, nRanks
-        integer, intent(out) :: iRank
+    ! Use iBlock to find which iRank
+    ! it belongs to
 
-        integer :: nBlockPerRank
+    subroutine GetiRank(nBlockTotal, nRanks, iBlock, iRank)
+        integer, intent(in)     ::  nBlockTotal     !   N of Blocks total
+        integer, intent(in)     ::  nRanks          !   N of ranks total
+        integer, intent(in)     ::  iBlock          !   i of Block to look at
+        integer, intent(out)    ::  iRank           !   The result i of rank
+
+        integer                 ::  nBlockPerRank   !   How many blocks per rank
+
         nBlockPerRank = nBlockTotal / nRanks
         iRank = (iBlock - 1) / nBlockPerRank
     
