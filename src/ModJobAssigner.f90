@@ -7,32 +7,32 @@ module ModJobAssigner
     implicit none
 
 contains
-    subroutine GetRange(irank, iBlock, nGridTotal, nRanks, iStart, iEnd)
-        integer, intent(in) :: irank, nGridTotal, nRanks
+    subroutine GetRange(irank, iBlock, nBlockTotal, nRanks, iStart, iEnd)
+        integer, intent(in) :: irank, nBlockTotal, nRanks
         integer, intent(out) :: iBlock, iStart, iEnd
 
-        integer :: nGridPerRank
+        integer :: nBlockPerRank
 
-        nGridPerRank = nGridTotal/nRanks
-        iStart = irank * nGridPerRank + 1
-        iEnd = (irank + 1 ) * nGridPerRank
+        nBlockPerRank = nBlockTotal/nRanks
+        iStart = irank * nBlockPerRank + 1
+        iEnd = (irank + 1 ) * nBlockPerRank
 
         if (irank == nRanks - 1) then
-            iEnd = nGridTotal
+            iEnd = nBlockTotal
         endif 
 
         iBlock = irank + 1
 
     end subroutine GetRange
 
-    subroutine GetiBlock(iStart, iEnd, nGridTotal, nRanks, iBlock)
-        integer, intent(in) :: iStart, iEnd, nGridTotal, nRanks
-        integer, intent(out) :: iBlock
+    subroutine GetiRank(nBlockTotal, nRanks, iBlock)
+        integer, intent(in) :: nBlockTotal, nRanks
+        integer, intent(out) :: iRank
 
-        integer :: nGridPerRank
-        nGridPerRank = nGridTotal / nRanks
-        iBlock = (iStart - 1) / nGridPerRank + 1
+        integer :: nBlockPerRank
+        nBlockPerRank = nBlockTotal / nRanks
+        iRank = (iBlock - 1) / nBlockPerRank
     
-    end subroutine GetiBlock
+    end subroutine GetiRank
 
 end module ModJobAssigner
