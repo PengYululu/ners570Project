@@ -24,5 +24,5 @@ target_link_libraries(MPI_Library PRIVATE ${MPI_Fortran_LIBRARIES})
 set_target_properties(MPI_Library PROPERTIES Fortran_COMPILER mpif90)
 
 # Combine both libraries into the final executable
-add_executable(Simulation main.f90)
-target_link_libraries(Simulation PRIVATE MPI_Library NonMPI_Library)
+#add_executable(Simulation main.f90)
+#target_link_libraries(Simulation PRIVATE MPI_Library NonMPI_Library)
