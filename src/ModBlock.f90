@@ -80,7 +80,8 @@ contains
         if (allocated(block%values)) deallocate(block%values)
     end subroutine Clean_OneBlock
 
-    subroutine Init_AllBlocks(blocks, nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars, x_range_global, y_range_global, z_range_global)
+    subroutine Init_AllBlocks(blocks, nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars, &
+        x_range_global, y_range_global, z_range_global)
         implicit none
         type(BlockType), dimension(:), intent(inout) :: blocks
         integer, intent(in) :: nBlocks, Mx, My, Mz, nx, ny, nz, ng, nvars
@@ -88,7 +89,8 @@ contains
         integer :: iBlock
 
         do iBlock = 0, nBlocks-1
-            call Init_OneBlock(blocks(iBlock+1), iBlock, Mx, My, Mz, nx, ny, nz, ng, nvars, x_range_global, y_range_global, z_range_global)
+            call Init_OneBlock(blocks(iBlock+1), iBlock, Mx, My, Mz, nx, ny, nz, ng, nvars, &
+                x_range_global, y_range_global, z_range_global)
         end do
     end subroutine Init_AllBlocks
 
