@@ -10,6 +10,7 @@ include_directories(${CMAKE_BINARY_DIR}/src)
 # Define the test source files
 set(TEST_SOURCES
     test_JobAssigner.f90
+    test_Parameters.f90
 )
 
 # Loop through the test files
@@ -24,6 +25,17 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
         target_compile_options(${TEST_NAME} PRIVATE ${MPI_Fortran_COMPILE_FLAGS})
         target_include_directories(${TEST_NAME} PRIVATE ${MPI_Fortran_INCLUDE_PATH})
         target_link_libraries(${TEST_NAME} PRIVATE MPI_Library NonMPI_Library ${MPI_Fortran_LIBRARIES})
+
+        # Add the test to CTest
+        add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+    endif()
+
+    if(${TEST_NAME} STREQUAL "test_Parameters")
+        # Create the executable for the MPI test
+        add_executable(${TEST_NAME} ${TEST_SOURCE})
+
+        # Add MPI compile flags, include paths, and libraries
+        target_link_libraries(${TEST_NAME} PRIVATE NonMPI_Library )
 
         # Add the test to CTest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

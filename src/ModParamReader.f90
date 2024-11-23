@@ -88,6 +88,23 @@ module ModParamReader
                     end if
                 
                 case ("#BLOCKS")
+                    read(unit, *, iostat=ios) Mx
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading Mx"
+                        stop 1
+                    end if
+                    read(unit, *, iostat=ios) My
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading My"
+                        stop 1
+                    end if
+                    read(unit, *, iostat=ios) Mz
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading Mz"
+                        stop 1
+                    end if
+
+                case ("#GRID")
                     read(unit, *, iostat=ios) nx
                     if (ios/=0) then
                         write(*,*) "Error from ",name_sub,": Error reading nx"
@@ -150,12 +167,18 @@ module ModParamReader
                 case("#SUPERADIABATICITY")
                     read(unit, *, iostat=ios) var
                     select case (trim(adjustl(var)))
-                    case("artificial","ARTIFICIAL","Aritificial")
-                        TypeDiffusion="Aritificial"
+                    case("const","CONST","Const","Constant","CONSTANT","constant")
+                        TypeSuperAdiabaticity="const"
                     case default
-                        write(*,*) "Error from ",name_sub,": Unknown TypeDiffusion=",trim(adjustl(var))
+                        write(*,*) "Error from ",name_sub,": Unknown TypeSuperAdiabaticity=",trim(adjustl(var))
                         stop 1
                     end select
+
+                    read(unit, *, iostat=ios) SuperAdiabaticity
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading SuperAdiabaticity"
+                        stop 1
+                    end if
 
                 end select
             end if

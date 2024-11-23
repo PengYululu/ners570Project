@@ -28,7 +28,7 @@ Module ModParameters
     real                ::  GasGamma=5./3.          !   Gamma of the ideal gas
     
     ! Superadiabaticity
-    character(len=100)  ::  TypeSuperAdiabaticity   !   Type of superadiavaticity
+    character(len=100)  ::  TypeSuperAdiabaticity   !   Type of superadiabaticity
     real                ::  SuperAdiabaticity
     
 end module ModParameters
