@@ -8,6 +8,7 @@ module ModBlock
         integer :: ng         ! number of ghost cells
         
         real, allocatable :: values(:,:,:,:)
+        real, allocatable :: rho0(:,:,:), P0(:,:,:)
         
         ! Grid spacing
         real :: dx, dy, dz
@@ -16,6 +17,10 @@ module ModBlock
         real :: x_range(2)  ! (start_index, end_index) in x direction
         real :: y_range(2)  
         real :: z_range(2)  
+
+        logical :: if_top
+        logical :: if_bottom
+        
     end type BlockType
 
 contains
@@ -53,19 +58,14 @@ contains
         block%y_range(1) = (iy - 1) * ny * (y_range_global / real(My * ny)) + 1
         block%y_range(2) = iy * ny * (y_range_global / real(My * ny))
         block%z_range(1) = (iz - 1) * nz * (z_range_global / real(Mz * nz)) + 1
-        block%z_range(1) = iz * nz * (z_range_global / real(Mz * nz))
+        block%z_range(2) = iz * nz * (z_range_global / real(Mz * nz))
 
         block%dx = (x_range_global / real(Mx * nx))
         block%dy = (y_range_global / real(My * ny))
         block%dz = (z_range_global / real(Mz * nz)) 
 
-        ! Calculate global index ranges for this block
-        ! block%x_range(1) = ix * nx + 1
-        ! block%x_range(2) = (ix + 1) * nx
-        ! block%y_range(1) = iy * ny + 1
-        ! block%y_range(2) = (iy + 1) * ny
-        ! block%z_range(1) = iz * nz + 1
-        ! block%z_range(2) = (iz + 1) * nz
+        block%if_bottom = (iz == 1)
+        block%if_top = (iz == Mz)
         
         ! Allocate memory for values array including ghost cells
         if (allocated(block%values)) deallocate(block%values)
@@ -104,5 +104,45 @@ contains
             call Clean_OneBlock(blocks(iBlock+1))
         end do
     end subroutine Clean_AllBlocks
+
+    subroutine Init_Block_rho0P0(block, iBlock, Mx, My, Mz, GasGamma, z_range_global)
+        implicit none
+        type(BlockType), intent(inout) :: block
+        integer, intent(in) :: iBlock, Mx, My, Mz
+        real, intent(in) :: GasGamma, z_range_global
+        integer :: i, j, k, m, iz
+        real :: z_start, z_end, z_local, z_global
+
+        iz = iBlock / (Mx * My) + 1
+        z_start = block%z_range(1)
+        z_end = block%z_range(2)
+        m = 1.0 / (GasGamma - 1.0)
+
+        do k = -block%ng+1, block%nz + block%ng
+            do j = -block%ng+1, block%ny + block%ng
+                do i = -block%ng+1, block%nx + block%ng
+                    z_local = z_start + (k-1)*block%dz
+                    z_global = z_local / z_range_global
+                    block%rho0(i,j,k) = (1 - z_global/(m+1))**m
+                    block%P0(i,j,k) = (1 - z_global/(m+1))**(m+1)
+                end do
+            end do
+        end do
+    
+    end subroutine Init_Block_rho0P0
+
+    subroutine All_Block_rho0P0(blocks, nBlocks, Mx, My, Mz, GasGamma, z_range_global)
+        implicit none
+        type(BlockType), dimension(:), intent(inout) :: blocks
+        integer, intent(in) :: nBlocks, Mx, My, Mz
+        real, intent(in) :: GasGamma, z_range_global
+        integer :: iBlock
+
+        do iBlock = 0, nBlocks-1
+            call Init_Block_rho0P0(blocks(iBlock+1), iBlock, Mx, My, Mz, GasGamma, z_range_global)
+        end do
+    end subroutine All_Block_rho0P0
+
+
 
 end module ModBlock
