@@ -31,4 +31,7 @@ Module ModParameters
     character(len=100)  ::  TypeSuperAdiabaticity   !   Type of superadiabaticity
     real                ::  SuperAdiabaticity
     
+    ! Initiatino
+    character(len=100)  ::  TypeInitiation
+    real                ::  RandomScale
 end module ModParameters

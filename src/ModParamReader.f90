@@ -3,7 +3,8 @@ module ModParamReader
     use ModParameters, only: Mx,My,Mz,nBlocks_global,&
         nx,ny,nz,ng,x_range_global,y_range_global,z_range_global,&
         Xi,TypeDiffusion,Diffusion_h,UseGravity,TypeGas,&
-        TypeSuperAdiabaticity,SuperAdiabaticity,UseRSST
+        TypeSuperAdiabaticity,SuperAdiabaticity,UseRSST,&
+        TypeInitiation,RandomScale
 
     ! Generic interface to read a parameter from a line
     !
@@ -54,7 +55,7 @@ module ModParamReader
                         write(*,*) "Error from ",name_sub,": Unknown UseGravity=",trim(adjustl(var))
                         stop 1
                     end select
-    
+                    
                 case ("#DOMAIN")
                     read(unit, *, iostat=ios) x_range_global(1)
                     if (ios/=0) then
@@ -179,6 +180,25 @@ module ModParamReader
                         write(*,*) "Error from ",name_sub,": Error reading SuperAdiabaticity"
                         stop 1
                     end if
+                
+                case("#INITIATION")
+                    read(unit, *, iostat=ios) var
+                    select case (trim(adjustl(var)))
+                    case("random","Random","RANDOM","r","R")
+                        TypeInitiation="random"
+                    case default
+                        write(*,*) "Error from ",name_sub,": Unknown TypeInitiation=",trim(adjustl(var))
+                        stop 1
+                    end select
+
+                    select case(TypeInitiation)
+                    case("random")
+                        read(unit, *, iostat=ios) RandomScale
+                        if (ios/=0) then
+                            write(*,*) "Error from ",name_sub,": Error reading RandomScale"
+                            stop 1
+                        end if
+                    end select
 
                 end select
             end if
