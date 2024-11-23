@@ -8,6 +8,7 @@ module ModBlock
         integer :: ng         ! number of ghost cells
         
         real, allocatable :: values(:,:,:,:)
+        real, allocatable :: values_rk(:,:,:,:)
         real, allocatable :: rho0(:,:,:), P0(:,:,:)
         
         ! Grid spacing
@@ -70,7 +71,14 @@ contains
         ! Allocate memory for values array including ghost cells
         if (allocated(block1%values)) deallocate(block1%values)
         allocate(block1%values(-ng+1:nx+ng, -ng+1:ny+ng, -ng+1:nz+ng, nvars))
+
+        ! Allocate memory for values array including ghost cells
+        if (allocated(block1%values_rk)) deallocate(block1%values_rk)
+        allocate(block1%values_rk(-ng+1:nx+ng, -ng+1:ny+ng, -ng+1:nz+ng, nvars))
+
+        ! Set initial values to 0
         block1%values = 0.0
+        block1%values_rk = 0.0
     end subroutine Init_OneBlock
     
     subroutine Clean_OneBlock(block)
