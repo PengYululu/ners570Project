@@ -1,10 +1,10 @@
 #DOMAIN
 -1.0            xmin
 -1.0            ymin
--1.0            zmin
+0.0             zmin
 1.0             xmax
 1.0             ymax
-1.0             zmax
+2.2             zmax
 
 #BLOCKS
 5               Mx      
@@ -35,5 +35,14 @@ artificial      TypeDiffusion
 const           TypeSuperAdiabaticity
 1.e-4           SuperAdiabaticity
 
+#INITIATION
+random          TypeInitiation
+1.e-6           RandomScale
 
+#TIMESTEPPING
+4               rk_level
+0.7             CFL
+
+#RUN
+100             nsteps
 

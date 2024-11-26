@@ -1,10 +1,12 @@
 module ModParamReader
 
-    use ModParameters, only: Mx,My,Mz,nBlocks_global,&
+    use ModJobAssigner
+    use ModParameters, only: Mx,My,Mz,nBlocks_global,nBlocks_local,&
         nx,ny,nz,ng,x_range_global,y_range_global,z_range_global,&
         Xi,TypeDiffusion,Diffusion_h,UseGravity,TypeGas,&
         TypeSuperAdiabaticity,SuperAdiabaticity,UseRSST,&
-        TypeInitiation,RandomScale
+        TypeInitiation,RandomScale,rk_level,CFL,nRanks,iRank,&
+        iBlock_Range,nsteps
 
     ! Generic interface to read a parameter from a line
     !
@@ -105,6 +107,21 @@ module ModParamReader
                         stop 1
                     end if
 
+                    if (maxval([Mx,My,Mz])>1000) then
+                        write(*,*) "Error from ",name_sub,": Mx/My/Mz too large"
+                        stop 1
+                    end if
+                    if (mod(Mx*My*Mz,nRanks)/=0) then
+                        write(*,*) "Mx My Mz=",Mx,My,Mz
+                        write(*,*) "nRanks=",nRanks
+                        write(*,*) "Error from ",name_sub,": Mx*My*Mz should be multiple of nRanks"
+                        stop 1
+                    end if
+
+                    nBlocks_Global=Mx*My*Mz
+                    nBlocks_local=nBlocks_Global/nRanks
+                    call GetRange(irank, nBlocks_Global, nRanks, iBlock_range)
+
                 case ("#GRID")
                     read(unit, *, iostat=ios) nx
                     if (ios/=0) then
@@ -199,6 +216,27 @@ module ModParamReader
                             stop 1
                         end if
                     end select
+
+                case("#TIMESTEPPING")
+                    read(unit, *, iostat=ios) rk_level
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading rk_level"
+                        stop 1
+                    end if
+
+                    read(unit, *, iostat=ios) CFL
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading CFL"
+                        stop 1
+                    end if
+
+                case("#RUN")
+                    read(unit, *, iostat=ios) nsteps
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": Error reading nsteps"
+                        stop 1
+                    end if
+                    
 
                 end select
             end if
