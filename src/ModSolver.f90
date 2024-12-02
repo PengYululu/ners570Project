@@ -15,7 +15,7 @@ module ModSolver
         real,intent(out)            ::  update_R(1:nx, 1:ny, 1:nz, 1:5)
         real,pointer                ::  values(:,:,:,:)
         integer                     ::  direction1,direction2
-        real                        ::  tmp(-ng+1:ng+nx, -ng+1:ng+ny, -ng+1:ng+nz, 3)
+        real                        ::  tmp(-ng+1:ng+nx, -ng+1:ng+ny, -ng+1:ng+nz)
         real                        ::  p1(-ng+1:ng+nx, -ng+1:ng+ny, -ng+1:ng+nz)
 
         ! Set if to por bottom boundary condition
@@ -35,7 +35,7 @@ module ModSolver
 
         ! equation 1: partial(rho)/partial(t)
         do direction1 = 1, 3
-            tmp(:,:,:,direction1) = Block1%rho0 * values(:,:,:,direction1+1)
+            tmp = Block1%rho0 * values(:,:,:,direction1+1)
             update_R(:,:,:,1) = update_R(:,:,:,1) - 1.0 / (8.0 * SuperAdiabaticity * Xi**2) * &
                                 ModDerivative_1st_O4_3D(tmp, nx, ny, nz, ng,&
                                 Block1%dx, Block1%dy, Block1%dz,direction1)
@@ -45,6 +45,7 @@ module ModSolver
         do direction1 = 1, 3
             do direction2 = 1,3
                 update_R(:,:,:,direction1+1) = &
+                    update_R(:,:,:,direction1+1) - &
                     values(1:nx,1:ny,1:nz,direction2+1) * &
                     ModDerivative_1st_O4_3D(values(:,:,:,direction1+1), &
                     nx, ny, nz, ng, Block1%dx, Block1%dy, Block1%dz, direction2)
@@ -55,16 +56,16 @@ module ModSolver
         do direction1 = 1, 3
             update_R(:,:,:,direction1+1) = &
                 update_R(:,:,:,direction1+1) - &
-                ModDerivative_1st_O4_3D(values(:,:,:,1), &
+                ModDerivative_1st_O4_3D(p1, &
                 nx, ny, nz, ng, Block1%dx, Block1%dy, Block1%dz, direction1) / &
-                 Block1%rho0(1:nx, 1:ny, 1:nz)
+                Block1%rho0(1:nx, 1:ny, 1:nz)
         end do
 
         ! equation 2: -rho1/rho0 * e_z
         update_R(:,:,:,4)=update_R(:,:,:,4)-values(1:nx,1:ny,1:nz,1) / Block1%rho0(1:nx, 1:ny, 1:nz)
 
         ! equation 3: vz/p0
-        update_R(:,:,:,5)=values(1:nx,1:ny,1:nz,4) / Block1%p0(1:nx,1:ny,1:nz)
+        update_R(:,:,:,5)=values(1:nx,1:ny,1:nz,4) / Block1%p0(1:nx,1:ny,1:nz)/8.
 
         ! equation 3: - (v dot nabla)s1
         do direction2=1,3

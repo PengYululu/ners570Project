@@ -30,7 +30,7 @@ program main
     call Initiate_values(Blocks)
 
     ! First communication
-    call ModCommunication_CommunicateAll(Blocks,.false.)
+    !call ModCommunication_CommunicateAll(Blocks,.false.)
 
     ! Run
     do istep=1,nsteps

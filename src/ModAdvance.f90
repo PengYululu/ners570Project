@@ -21,6 +21,7 @@ module ModAdvance
         ! First get dt
         call ModCommunication_GetDtGlobal(Blocks,dt)
         print *,dt
+        print *,rk_level
 
         ! Runge Kutta 4 time stepping
         do rk_index=1,rk_level
@@ -43,7 +44,7 @@ module ModAdvance
             end do
 
             ! Communicate ghost cells
-            call ModCommunication_CommunicateAll(Blocks,if_rk_output)
+            !call ModCommunication_CommunicateAll(Blocks,if_rk_output)
         end do
 
     end subroutine ModAdvance_All

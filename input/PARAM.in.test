@@ -7,14 +7,14 @@
 2.2             zmax
 
 #BLOCKS
-5               Mx      
-5               My
-5               Mz
+1               Mx      
+1               My
+1               Mz
 
 #GRID
-10              nx
-10              ny
-10              nz
+100             nx
+100             ny
+100             nz
 2               ng
 
 #GAS
