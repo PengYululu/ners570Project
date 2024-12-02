@@ -4,7 +4,7 @@ module ModCommunication
         SuperAdiabaticity,iRank,nRanks,iBlock_range
     use ModBlock
     use mpi
-
+    
     contains
 
     subroutine ModCommunication_GetDtGlobal(Blocks,dt_global)
