@@ -1,8 +1,8 @@
-module ModDeviation
+module ModDerivative
 
     contains
 
-    ! Get the deviation of 3D array f to one of its direction x
+    ! Get the derivative of 3D array f to one of its direction x
     ! with fourth order spatial accuracy:
     !
     !    df     - f^{n+2} + 8 f^{n+1} - 8 f^{n-1} + f^{n-2}
@@ -13,12 +13,12 @@ module ModDeviation
     !           f           :   The 3D array (including GCs)
     !           ni,nj,nk,ng :   The grid numbers
     !           dxi(j,k)    :   The grid sizes
-    !           direction   :   Which direction to get deviation
+    !           direction   :   Which direction to get derivative
     !   
     !   Output:
-    !           df_dx       :   Deviation of each physical cell
+    !           df_dx       :   derivative of each physical cell
 
-    function ModDeviation_1st_O4_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(df_dx)
+    function Modderivative_1st_O4_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(df_dx)
         implicit none
         integer,intent(in)  ::  ni,nj,nk,ng,direction
         real,intent(in)     ::  f(-ng+1:ni+ng,-ng+1:nj+ng,-ng+1:nk+ng)
@@ -45,9 +45,9 @@ module ModDeviation
                 - 8.* f(1:ni,1:nj,( 0):(nk-1)) &
                 +     f(1:ni,1:nj,(-1):(nk-2)))
         end select
-    end function ModDeviation_1st_O4_3D
+    end function Modderivative_1st_O4_3D
 
-    ! Get the deviation of 3D array f to one of its direction x
+    ! Get the derivative of 3D array f to one of its direction x
     ! with second order spatial accuracy:
     !
     !    df     f^{n+1} - f^{n-1}
@@ -58,12 +58,12 @@ module ModDeviation
     !           f           :   The 3D array (including GCs)
     !           ni,nj,nk,ng :   The grid numbers
     !           dxi(j,k)    :   The grid sizes
-    !           direction   :   Which direction to get deviation
+    !           direction   :   Which direction to get derivative
     !   
     !   Output:
-    !           df_dx       :   Deviation of each physical cell
+    !           df_dx       :   derivative of each physical cell
 
-    function ModDeviation_1st_O2_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(df_dx)
+    function Modderivative_1st_O2_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(df_dx)
         implicit none
         integer,intent(in)  ::  ni,nj,nk,ng,direction
         real,intent(in)     ::  f(-ng+1:ni+ng,-ng+1:nj+ng,-ng+1:nk+ng)
@@ -84,7 +84,7 @@ module ModDeviation
                 + f(1:ni,1:nj,(2):(nk+1)) &
                 - f(1:ni,1:nj,(0):(nk-1)))
         end select
-    end function ModDeviation_1st_O2_3D
+    end function Modderivative_1st_O2_3D
 
     ! Get the second order partial derivation d^2 f / dx dy
     ! with fourth order spatial accuracy.
@@ -97,9 +97,9 @@ module ModDeviation
     !           direction2  :   Second direction
     !   
     !   Output:
-    !           d2f_dx_dy   :   Deviation of each physical cell
+    !           d2f_dx_dy   :   derivative of each physical cell
 
-    function ModDeviation_pxpy_O4_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction1,direction2) result(d2f_dx_dy)
+    function Modderivative_pxpy_O4_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction1,direction2) result(d2f_dx_dy)
         implicit none
         integer,intent(in)  ::  ni,nj,nk,ng,direction1,direction2
         real,intent(in)     ::  f(-ng+1:ni+ng,-ng+1:nj+ng,-ng+1:nk+ng)
@@ -147,7 +147,7 @@ module ModDeviation
                 - 8.* df_dx(1:ni,1:nj,( 0):(nk-1)) &
                 +     df_dx(1:ni,1:nj,(-1):(nk-2)))
         end select
-    end function ModDeviation_pxpy_O4_3D
+    end function Modderivative_pxpy_O4_3D
 
     ! Get the second order partial derivation d^2 f / dx^{2}
     ! with third order spatial accuracy.
@@ -164,9 +164,9 @@ module ModDeviation
     !           direction2  :   Second direction
     !   
     !   Output:
-    !           d2f_dx2     :   Deviation of each physical cell
+    !           d2f_dx2     :   derivative of each physical cell
 
-    function ModDeviation_2nd_O3_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(d2f_dx2)
+    function Modderivative_2nd_O3_3D(f,ni,nj,nk,ng,dxi,dxj,dxk,direction) result(d2f_dx2)
         implicit none
         integer,intent(in)  :: ni,nj,nk,ng,direction
         real,intent(in)     :: f(-ng+1:ni+ng,-ng+1:nj+ng,-ng+1:nk+ng)
@@ -196,5 +196,5 @@ module ModDeviation
                 + 16.* f(1:ni,1:nj,( 0):(nk-1)) &
                 -      f(1:ni,1:nj,(-1):(nk-2)))
         end select
-    end function ModDeviation_2nd_O3_3D
-end module ModDeviation
+    end function Modderivative_2nd_O3_3D
+end module ModDerivative
