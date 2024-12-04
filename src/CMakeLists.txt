@@ -2,7 +2,7 @@
 file(GLOB ALL_SOURCES *.f90)
 
 # Exclude ModCommunicator.f90 and ModAdvance.f90 (requires MPI)
-list(FILTER ALL_SOURCES EXCLUDE REGEX ".*(main|ModCommunicator|ModAdvance)\\.f90")
+list(FILTER ALL_SOURCES EXCLUDE REGEX ".*(main|ModCommunicator|ModAdvance|ModSavePlot)\\.f90")
 
 # Find MPI
 find_package(MPI REQUIRED)
@@ -11,6 +11,7 @@ find_package(MPI REQUIRED)
 set(MPI_SOURCES 
     ModCommunicator.f90
     ModAdvance.f90
+    ModSavePlot.f90
 )
 
 # Non-MPI sources (remaining files)

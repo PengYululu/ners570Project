@@ -20,6 +20,9 @@ module ModBlock
         real                ::  x_range(2),&            ! Global index ranges for this block
                                 y_range(2),&            ! (start_index, end_index) in x direction
                                 z_range(2)
+        
+        real, allocatable   ::  x_list(:),y_list(:),&
+                                z_list(:)
 
         logical             ::  if_top,if_bottom        ! If near top or bottom boundary
         integer             ::  iBlock_l,iBlock_r,&     ! Neighbours
@@ -30,6 +33,14 @@ module ModBlock
                                 iRank_u,iRank_d
 
         integer             ::  n_sends                 ! Number of information to be sent each time
+
+        real, allocatable   ::  Buffer_send_l(:,:,:,:),Buffer_send_r(:,:,:,:),&
+                                Buffer_send_f(:,:,:,:),Buffer_send_b(:,:,:,:),&
+                                Buffer_send_u(:,:,:,:),Buffer_send_d(:,:,:,:)
+        
+        real, allocatable   ::  Buffer_recv_l(:,:,:,:),Buffer_recv_r(:,:,:,:),&
+                                Buffer_recv_f(:,:,:,:),Buffer_recv_b(:,:,:,:),&
+                                Buffer_recv_u(:,:,:,:),Buffer_recv_d(:,:,:,:)
     end type BlockType
 
     contains
@@ -57,7 +68,7 @@ module ModBlock
         implicit none
         type(BlockType), target ::  block1
         integer, intent(in)     ::  iBlock
-        integer                 ::  ix, iy, iz
+        integer                 ::  ix, iy, iz,i
         
         ! Label the block index
         Block1%iBlock=iBlock
@@ -84,6 +95,22 @@ module ModBlock
         block1%dx = (block1%x_range(2) - block1%x_range(1))/nx
         block1%dy = (block1%y_range(2) - block1%y_range(1))/ny
         block1%dz = (block1%z_range(2) - block1%z_range(1))/nz
+
+        ! Get xyz_list
+
+        allocate(block1%x_list(-ng+1:nx+ng))
+        allocate(block1%y_list(-ng+1:ny+ng))
+        allocate(block1%z_list(-ng+1:nz+ng))
+
+        do i=-ng+1,nx+ng
+            block1%x_list(i)=(block1%x_range(1)*(nx-i+0.5)+block1%x_range(2)*(i-0.5))/nx
+        end do
+        do i=-ng+1,ny+ng
+            block1%y_list(i)=(block1%y_range(1)*(ny-i+0.5)+block1%y_range(2)*(i-0.5))/ny
+        end do
+        do i=-ng+1,nz+ng
+            block1%z_list(i)=(block1%z_range(1)*(nz-i+0.5)+block1%z_range(2)*(i-0.5))/nz
+        end do
 
         ! Determine if this block is near top or bottom boundary 
         block1%if_bottom = (iz == 1)
@@ -127,6 +154,20 @@ module ModBlock
         if (Block1%iRank_f/=iRank) Block1%n_sends=Block1%n_sends+1
         if (Block1%iRank_u/=iRank .and. .not. Block1%if_top) Block1%n_sends=Block1%n_sends+1
         if (Block1%iRank_d/=iRank .and. .not. Block1%if_bottom) Block1%n_sends=Block1%n_sends+1
+
+        ! Allocate the buffer grids
+        if (Block1%iRank_l/=iRank) &
+        allocate(Block1%Buffer_send_l(1:ng,1:ny,1:nz,5),        Block1%Buffer_recv_l(1:ng,1:ny,1:nz,5)   )
+        if (Block1%iRank_r/=iRank) &
+        allocate(Block1%Buffer_send_r(nx-ng+1:nx,1:ny,1:nz,5),  Block1%Buffer_recv_r(nx+1:nx+ng,1:ny,1:nz,5))
+        if (Block1%iRank_b/=iRank) &
+        allocate(Block1%Buffer_send_b(1:nx,1:ng,1:nz,5),        Block1%Buffer_recv_b(1:nx,-ng+1:0,1:nz,5)   )
+        if (Block1%iRank_f/=iRank) &
+        allocate(Block1%Buffer_send_f(1:nx,ny-ng+1:ny,1:nz,5),  Block1%Buffer_recv_f(1:nx,ny+1:ny+ng,1:nz,5))
+        if (Block1%iRank_d/=iRank .and. .not. Block1%if_bottom) &
+        allocate(Block1%Buffer_send_d(1:nx,1:ny,1:ng,5),        Block1%Buffer_recv_d(1:nx,1:ny,-ng+1:0,5)   )
+        if (Block1%iRank_u/=iRank .and. .not. Block1%if_top) &
+        allocate(Block1%Buffer_send_u(1:nx,1:ny,nz-ng+1:nz,5),  Block1%Buffer_recv_u(1:nx,1:ny,nz+1:nz+ng,5))
     end subroutine Init_OneBlock
     
     subroutine Clean_OneBlock(block)
@@ -161,9 +202,9 @@ module ModBlock
         do k = -ng+1, nz + ng
             do j = -ng+1, ny + ng
                 do i = -ng+1, nx + ng
-                    z = block1%z_range(1) + (k-0.5)*block1%dz
-                    block1%rho0(i,j,k) = (1 - z/(m+1))**m
-                    block1%P0(i,j,k) = (1 - z/(m+1))**(m+1)
+                    z = block1%z_list(k)
+                    block1%rho0(i,j,k) = (1.0 - z/(m+1))**m
+                    block1%P0(i,j,k) = (1.0 - z/(m+1))**(m+1)
                 end do
             end do
         end do

@@ -159,6 +159,11 @@ module ModParamReader
                     select case (trim(adjustl(var)))
                     case("T","t","true","True","TRUE")
                         UseRSST = .true.
+                        read(unit, *, iostat=ios) Xi
+                        if (ios/=0) then
+                            write(*,*) "Error from ",name_sub,": Error reading Xi"
+                            stop 1
+                        end if
                     case("F","f","false","False","FALSE")
                         UseRSST = .false.
                     case default

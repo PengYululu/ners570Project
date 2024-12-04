@@ -30,7 +30,7 @@ module ModSolver
         end if
 
         ! Set p1
-        p1 = GasGamma * Block1%P0 * values(:,:,:,1) / Block1%rho0 + values(:,:,:,5) 
+        p1 = GasGamma * Block1%P0 * (values(:,:,:,1) / Block1%rho0 + values(:,:,:,5))
         update_R=0.0
 
         ! equation 1: partial(rho)/partial(t)
@@ -99,16 +99,16 @@ module ModSolver
         ! Top 
         if (Block1%if_top) then
             do i=nz+1,nz+ng
-                values(:,:,i,[1,3,4])=values(:,:,2*nz+1-i,[1,3,4])
-                values(:,:,i,[2,5])=-values(:,:,2*nz+1-i,[2,5])
+                values(:,:,i,[1,2,3])=values(:,:,2*nz+1-i,[1,2,3])
+                values(:,:,i,[4,5])=-values(:,:,2*nz+1-i,[4,5])
             end do
         end if
 
         ! Bottom
         if (Block1%if_bottom) then
             do i=-ng+1,0
-                values(:,:,i,[1,3,4])=values(:,:,1-i,[1,3,4])
-                values(:,:,i,[2,5])=-values(:,:,1-i,[2,5])
+                values(:,:,i,[1,2,3])=values(:,:,1-i,[1,2,3])
+                values(:,:,i,[4,5])=-values(:,:,1-i,[4,5])
             end do
         end if
     end subroutine SetBoundary

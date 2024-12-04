@@ -41,8 +41,8 @@ random          TypeInitiation
 
 #TIMESTEPPING
 4               rk_level
-0.7             CFL
+0.5             CFL
 
 #RUN
-100             nsteps
+2000             nsteps
 
