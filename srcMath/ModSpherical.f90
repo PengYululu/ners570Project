@@ -135,7 +135,7 @@ module ModSpherical
 
         ! Preparations
         r_inverse=1./r(1:nr)
-        cotant=cotan(t(1:nt))
+        cotant=cos(t(1:nt))/cos(t(1:nt))
         ! First three terms for direction i is simply A * nabla B_{i}
         do direction=1,3
             A_dot_nabla_B(:,:,:,direction)=&
