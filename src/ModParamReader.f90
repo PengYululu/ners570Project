@@ -6,7 +6,7 @@ module ModParamReader
         Xi,TypeDiffusion,Diffusion_h,UseGravity,TypeGas,&
         TypeSuperAdiabaticity,SuperAdiabaticity,UseRSST,&
         TypeInitiation,RandomScale,rk_level,CFL,nRanks,iRank,&
-        iBlock_Range,nsteps
+        iBlock_Range,nsteps,nStepSavePlot
 
     ! Generic interface to read a parameter from a line
     !
@@ -241,7 +241,13 @@ module ModParamReader
                         write(*,*) "Error from ",name_sub,": Error reading nsteps"
                         stop 1
                     end if
-                    
+
+                case("#SAVEPLOT")
+                    read(unit, *, iostat=ios) nStepSavePlot
+                    if (ios/=0) then
+                        write(*,*) "Error from ",name_sub,": nStepSavePlot"
+                        stop 1
+                    end if
 
                 end select
             end if

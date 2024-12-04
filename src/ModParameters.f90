@@ -44,4 +44,7 @@ Module ModParameters
     
     ! RUN
     integer             ::  nsteps=100
+
+    ! Save plot
+    integer             ::  nStepSavePlot
 end module ModParameters

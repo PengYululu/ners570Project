@@ -44,5 +44,8 @@ random          TypeInitiation
 0.5             CFL
 
 #RUN
-10000             nsteps
+10000           nsteps
+
+#SAVEPLOT
+50              nStepSavePlot                           
 
