@@ -29,7 +29,6 @@ module ModSavePlot
         real                            :: xi_out(nij_out(1)),xj_out(nij_out(2))
         real                            :: dxi_out,dxj_out
         integer                         :: i_out_,j_out_,k_out_
-        real                            ::  write_tmp(8)
 
         ! for write
 
@@ -125,9 +124,7 @@ module ModSavePlot
                 write_xijk(i_out_)=xi_out(i)
                 write_xijk(j_out_)=xj_out(j)
                 write_xijk(k_out_)=position
-                write_tmp(1:3)=write_xijk
-                write_tmp(4:8)=save_primitive_global(:,i,j)
-                write(logical_unit,*)write_tmp
+                write(logical_unit,*)save_primitive_global(:,i,j)
             end do; end do
 
             close(logical_unit)
