@@ -34,14 +34,14 @@ module ModSpherical
         end do; end do
 
         ! r term
-        div_A=ModDeviation_1st_O4_3D(A_scaled(:,:,:,1),nr,nt,np,ng,dr,dt,dp,1)
+        div_A=ModDerivative_1st_O4_3D(A_scaled(:,:,:,1),nr,nt,np,ng,dr,dt,dp,1)
         do ip=1,np; do it=1,nt
             div_A(:,it,ip)=div_A(:,it,ip)*r2_inverse
         end do; end do
 
         ! th & ph terms
-        div_A23=ModDeviation_1st_O4_3D(A_scaled(:,:,:,2),nr,nt,np,ng,dr,dt,dp,2)
-        div_A23=div_A23+ModDeviation_1st_O4_3D(A(:,:,:,3),nr,nt,np,ng,dr,dt,dp,3)
+        div_A23=ModDerivative_1st_O4_3D(A_scaled(:,:,:,2),nr,nt,np,ng,dr,dt,dp,2)
+        div_A23=div_A23+ModDerivative_1st_O4_3D(A(:,:,:,3),nr,nt,np,ng,dr,dt,dp,3)
         do ip=1,np; do ir=1,nr
             div_A23(ir,:,ip)=div_A23(ir,:,ip)*sint_inverse
         end do; end do
@@ -68,16 +68,16 @@ module ModSpherical
         sint_inverse=1./sin(t(1:nt))
 
         ! r term
-        Grad_f(:,:,:,1)=ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,1)
+        Grad_f(:,:,:,1)=ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,1)
 
         ! th term
-        Grad_f(:,:,:,2)=ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,2)
+        Grad_f(:,:,:,2)=ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,2)
         do ip=1,np; do it=1,nt
             Grad_f(:,it,ip,2)=Grad_f(:,it,ip,2)*r_inverse
         end do; end do
 
         ! ph term
-        Grad_f(:,:,:,3)=ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,3)
+        Grad_f(:,:,:,3)=ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,3)
         do ip=1,np; do it=1,nt
             Grad_f(:,it,ip,3)=Grad_f(:,it,ip,3)*r_inverse
         end do; end do
@@ -102,16 +102,16 @@ module ModSpherical
         r_inverse=1./r(1:nr)
         sint_inverse=1./sin(t(1:nt))
         ! r term
-        A_dot_Grad_f=A(1:nr,1:nt,1:np,1)*ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,1)
+        A_dot_Grad_f=A(1:nr,1:nt,1:np,1)*ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,1)
 
         ! th term
-        tmp=A(1:nr,1:nt,1:np,2)*ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,2)
+        tmp=A(1:nr,1:nt,1:np,2)*ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,2)
         do ip=1,np; do it=1,nt
             A_dot_Grad_f(:,it,ip)=A_dot_Grad_f(:,it,ip)+tmp(:,it,ip)*r_inverse
         end do; end do
 
         ! ph term
-        tmp=A(1:nr,1:nt,1:np,3)*ModDeviation_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,3)
+        tmp=A(1:nr,1:nt,1:np,3)*ModDerivative_1st_O4_3D(f,nr,nt,np,ng,dr,dt,dp,3)
         do ip=1,np; do it=1,nt
             tmp(:,it,ip)=tmp(:,it,ip)*r_inverse
         end do; end do
