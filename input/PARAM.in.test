@@ -7,14 +7,14 @@
 2.2             zmax
 
 #BLOCKS
-1               Mx      
-1               My
-1               Mz
+2               Mx      
+2               My
+2               Mz
 
 #GRID
-100             nx
-100             ny
-100             nz
+50             nx
+50             ny
+50             nz
 2               ng
 
 #GAS
@@ -37,12 +37,12 @@ const           TypeSuperAdiabaticity
 
 #INITIATION
 random          TypeInitiation
-1.e-6           RandomScale
+1.e-8           RandomScale
 
 #TIMESTEPPING
 4               rk_level
 0.5             CFL
 
 #RUN
-2000             nsteps
+10000             nsteps
 
