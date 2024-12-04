@@ -4,7 +4,7 @@ program main
     use ModAdvance
     use ModCommunication
     use ModParameters,only      :   iRank,nRanks,nBlocks_local,&
-        nsteps,nx,ny,nz
+        nsteps,nx,ny,nz,nStepSavePlot
     use ModParamReader,only     :   Read_paramters
     use ModInitiator
     use ModSavePlot
@@ -57,7 +57,7 @@ program main
         if(iRank==0)print *,'End Advancing at iStep=',iStep,'t=',t_end-t0,'time used this step=',t_end-t_start
 
         write(iStep_char,'(I8)')iStep
-        if (mod(iStep,500)==0) then
+        if (mod(iStep,nStepSavePlot)==0) then
                 
             do i=1,len_trim(iStep_char)
                 if (iStep_char(i:i)==' ') iStep_char(i:i)='0'

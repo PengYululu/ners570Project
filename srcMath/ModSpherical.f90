@@ -1,6 +1,6 @@
 module ModSpherical
 
-    use ModDeviation
+    use ModDerivative
 
     contains
 
