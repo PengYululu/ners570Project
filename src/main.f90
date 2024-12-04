@@ -17,6 +17,7 @@ program main
     integer                     ::  istep
     integer                     ::  i,j,k
     character(len=8)            ::  iStep_char
+    real                        ::  t_start,t_end,t0
     !integer                     ::  iBlock_local
 
     ! MPI initiation
@@ -44,11 +45,16 @@ program main
     !    Blocks(1)%iBlock_b,Blocks(1)%iBlock_f,&
     !    Blocks(1)%iBlock_u,Blocks(1)%iBlock_d
     ! Run
+
+    if(iRank==0)call cpu_time(t0)
     
     do istep=1,nsteps
+
+        if(iRank==0)call cpu_time(t_start)
         call ModAdvance_All(Blocks)
-        if(iRank==0)print *,'End Advancing at iStep=',iStep
-        if(iRank==0)print *,maxval(Blocks(1)%values)
+        if(iRank==0)call cpu_time(t_end)
+
+        if(iRank==0)print *,'End Advancing at iStep=',iStep,'t=',t_end-t0,'time used this step=',t_end-t_start
 
         write(iStep_char,'(I8)')iStep
         if (mod(iStep,500)==0) then
