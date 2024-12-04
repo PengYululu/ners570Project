@@ -44,6 +44,7 @@ set(RUN_DIR ${CMAKE_BINARY_DIR}/run)
 # Create the run directory and copy input files
 file(MAKE_DIRECTORY ${RUN_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/input/PARAM.in.test DESTINATION ${RUN_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/PostProc/ReadMap.ipynb DESTINATION ${RUN_DIR})
 
 # Copy the executable to the run directory after it's built
 add_custom_command(
