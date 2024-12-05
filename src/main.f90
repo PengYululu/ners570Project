@@ -4,7 +4,7 @@ program main
     use ModAdvance
     use ModCommunication
     use ModParameters,only      :   iRank,nRanks,nBlocks_local,&
-        nsteps,nx,ny,nz,nStepSavePlot
+        nsteps,nx,ny,nz,nStepSavePlot,nxSave,nySave
     use ModParamReader,only     :   Read_paramters
     use ModInitiator
     use ModSavePlot
@@ -39,7 +39,7 @@ program main
     !end do; end do; end do
     
     call ModCommunication_CommunicateAll(Blocks,.false.)
-    call ModSave_2D(Blocks,'k',2.1,[100,100],filename='00000000.dat',logical_unit=2)
+    call ModSave_2D(Blocks,'k',2.1,[nxSave,nySave],filename='00000000.dat',logical_unit=2)
     !print *,iRank,Blocks(1)%x_list(0),Blocks(1)%values(0,1,1,:)
     !print *,"I'm",iRank,Blocks(1)%iBlock_r,Blocks(1)%iBlock_l,&
     !    Blocks(1)%iBlock_b,Blocks(1)%iBlock_f,&
@@ -62,7 +62,7 @@ program main
             do i=1,len_trim(iStep_char)
                 if (iStep_char(i:i)==' ') iStep_char(i:i)='0'
             end do
-            call ModSave_2D(Blocks,'k',2.1,[100,100],filename=iStep_char//'.dat',logical_unit=2)
+            call ModSave_2D(Blocks,'k',2.1,[nxSave,nySave],filename=iStep_char//'.dat',logical_unit=2)
         end if
         
     end do

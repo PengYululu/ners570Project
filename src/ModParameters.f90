@@ -47,4 +47,5 @@ Module ModParameters
 
     ! Save plot
     integer             ::  nStepSavePlot
+    integer             ::  nxSave,nySave
 end module ModParameters

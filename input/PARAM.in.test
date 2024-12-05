@@ -47,5 +47,6 @@ random          TypeInitiation
 10000           nsteps
 
 #SAVEPLOT
-50              nStepSavePlot                           
-
+200              nStepSavePlot                           
+200             nxSave
+200             nySave
