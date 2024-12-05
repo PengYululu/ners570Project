@@ -1,5 +1,7 @@
 module ModDiffusion
 
+    use ieee_arithmetic
+
     contains
 
     subroutine ModDiffusion_Aritificial(primitive,ni,nj,nk,ng,dxi,dxj,dxk,EQN_update_R,&
@@ -18,10 +20,11 @@ module ModDiffusion
         real                            ::  d_primitive(-ng+2:ni+ng-1,-ng+2:nj+ng-1,-ng+2:nk+ng-1,5)
         real,allocatable                ::  flux(:,:,:,:),phi(:,:,:,:)
         real,intent(inout)              ::  EQN_update_R(1:ni,1:nj,1:nk,1:5)
-
-        integer ::  ivar
+        integer ::  ivar,i,j,k
 
         do direction1=1,3
+
+            
 
             ! get total speed c
             c=abs(primitive(:,:,:,direction1+1))+c_s
@@ -39,9 +42,11 @@ module ModDiffusion
                 ! for the i+1/2 face.
                 phi(1:ni+1,:,:,:)=&
                     max(0.0,1.0+h*((primitive(1:ni+1,1:nj,1:nk,:)-d_primitive(1:ni+1,1:nj,1:nk,:)*0.5-&
-                    primitive(0:ni,1:nj,1:nk,:)-d_primitive(0:ni,1:nj,1:nk,:))/&
+                    primitive(0:ni,1:nj,1:nk,:)-d_primitive(0:ni,1:nj,1:nk,:)*0.5)/&
                     (primitive(1:ni+1,1:nj,1:nk,:)-primitive(0:ni,1:nj,1:nk,:))-1))
-                
+                do i=1,ni+1; do j=1,nj; do k=1,nk; do ivar=1,5
+                    phi(i,j,k,ivar)=merge(0.0,phi(i,j,k,ivar),ieee_is_nan(phi(i,j,k,ivar)))
+                end do; end do; end do; end do 
                 ! then get the flux.
                 ! f_{i+1/2}=-0.5 * c_{i+1/2}*phi*(u_r-u_l)
                 flux(1:ni+1,:,:,:)=&
@@ -72,9 +77,11 @@ module ModDiffusion
                 ! for the i+1/2 face.
                 phi(:,1:nj+1,:,:)=&
                     max(0.0,1.0+h*((primitive(1:ni,1:nj+1,1:nk,:)-d_primitive(1:ni,1:nj+1,1:nk,:)*0.5-&
-                    primitive(1:ni,0:nj,1:nk,:)-d_primitive(1:ni,0:nj,1:nk,:))/&
+                    primitive(1:ni,0:nj,1:nk,:)-d_primitive(1:ni,0:nj,1:nk,:)*0.5)/&
                     (primitive(1:ni,1:nj+1,1:nk,:)-primitive(1:ni,0:nj,1:nk,:))-1))
-                
+                do i=1,ni; do j=1,nj+1; do k=1,nk; do ivar=1,5
+                    phi(i,j,k,ivar)=merge(0.0,phi(i,j,k,ivar),ieee_is_nan(phi(i,j,k,ivar)))
+                end do; end do; end do; end do 
                 ! then get the flux.
                 ! f_{i+1/2}=-0.5 * c_{i+1/2}*phi*(u_r-u_l)
                 flux(:,1:nj+1,:,:)=&
@@ -104,8 +111,12 @@ module ModDiffusion
                 ! for the i+1/2 face.
                 phi(:,:,1:nk+1,:)=&
                     max(0.0,1.0+h*((primitive(1:ni,1:nj,1:nk+1,:)-d_primitive(1:ni,1:nj,1:nk+1,:)*0.5-&
-                    primitive(1:ni,1:nj,0:nk,:)-d_primitive(1:ni,1:nj,0:nk,:))/&
+                    primitive(1:ni,1:nj,0:nk,:)-d_primitive(1:ni,1:nj,0:nk,:)*0.5)/&
                     (primitive(1:ni,1:nj,1:nk+1,:)-primitive(1:ni,1:nj,0:nk,:))-1))
+                
+                do i=1,ni; do j=1,nj; do k=1,nk+1; do ivar=1,5
+                    phi(i,j,k,ivar)=merge(0.0,phi(i,j,k,ivar),ieee_is_nan(phi(i,j,k,ivar)))
+                end do; end do; end do; end do
                 
                 ! then get the flux.
                 ! f_{i+1/2}=-0.5 * c_{i+1/2}*phi*(u_r-u_l)
@@ -123,6 +134,8 @@ module ModDiffusion
                         (primitive(:,:,1:nk+1,direction2+1)+primitive(:,:,0:nk,direction2+1))*&
                         0.5*flux(:,:,:,1)
                 end do
+
+                
 
                 do ivar=1,5
                     EQN_update_R(:,:,:,ivar)=EQN_update_R(:,:,:,ivar)+&
