@@ -124,7 +124,7 @@ module ModSavePlot
                 write_xijk(i_out_)=xi_out(i)
                 write_xijk(j_out_)=xj_out(j)
                 write_xijk(k_out_)=position
-                write(logical_unit,*)write_xijk,save_primitive_global(:,i,j)
+                write(logical_unit,*)save_primitive_global(:,i,j)
             end do; end do
 
             close(logical_unit)
